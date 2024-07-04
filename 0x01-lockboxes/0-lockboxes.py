@@ -8,9 +8,8 @@ def canUnlockAll(boxes):
     n = 0
 
     for key in boxes:
-        if isinstance(key, list):
-            if key < 0:
-                return
+        if not isinstance(key, list):
+            return
         else:
             n = canUnlockAll(key)
             return True
