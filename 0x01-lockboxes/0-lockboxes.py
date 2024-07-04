@@ -4,7 +4,6 @@
 
 def canUnlockAll(boxes):
     """Write a method that determines if all the boxes can be opened"""
-    boxes = [[]]
     n = 0
 
     for key in boxes:
