@@ -16,6 +16,8 @@ def minOperations(n) -> int:
         return 0
     while n > 1:
         while n % fa == 0:
+            op += fa
             n //= fa
+
         fa += 1
     return op
