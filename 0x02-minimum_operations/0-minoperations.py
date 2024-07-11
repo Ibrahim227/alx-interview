@@ -8,7 +8,14 @@ def minOperations(n) -> int:
         of operations needed to result in exactly n H characters in the file
     Returns: integer
     """
-    if not n:
+    str = 'H'
+    op = 0
+    fa = 2
+
+    if n < 0:
         return 0
-    else:
-        print('ok')
+    while n > 1:
+        while n % fa == 0:
+            n //= fa
+        fa += 1
+    return op
