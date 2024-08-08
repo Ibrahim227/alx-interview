@@ -1,53 +1,47 @@
+
 #!/usr/bin/node
 
 const request = require('request');
 
+if (process.argv.length < 3) {
+  console.log('Usage: ./0-starwars_characters.js <Movie.id>');
+  process.exit(1);
+}
+
 const movieId = process.argv[2];
-const filmEndPoint = 'https://swapi-api.hbtn.io/api/films/' + movieId;
-let people = [];
-const names = [];
+const apiUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}`;
 
-const requestCharacters = async () => {
-  await new Promise(resolve => request(filmEndPoint, (err, res, body) => {
-    if (err || res.statusCode !== 200) {
-      console.error('Error: ', err, '| StatusCode: ', res.statusCode);
-    } else {
-      const jsonBody = JSON.parse(body);
-      people = jsonBody.characters;
-      resolve();
-    }
-  }));
+// Function to fetch data from the given URL
+const fetchData = (url) => {
+  return new Promise((resolve, reject) => {
+    request(url, (error, response, body) => {
+      if (error) {
+        reject(error); // Reject the promise if there's an error
+      } else if (response.statusCode !== 200) {
+        reject(
+          new Error(`Failed to load data, status code: ${response.statusCode}`)
+        ); // Reject the promise if the response status code is not 200
+      } else {
+        resolve(JSON.parse(body)); // Resolve the promise with the parsed JSON data
+      }
+    });
+  });
 };
 
-const requestNames = async () => {
-  if (people.length > 0) {
-    for (const p of people) {
-      await new Promise(resolve => request(p, (err, res, body) => {
-        if (err || res.statusCode !== 200) {
-          console.error('Error: ', err, '| StatusCode: ', res.statusCode);
-        } else {
-          const jsonBody = JSON.parse(body);
-          names.push(jsonBody.name);
-          resolve();
-        }
-      }));
-    }
-  } else {
-    console.error('Error: Got no Characters for some reason');
-  }
-};
+// Fetch movie data and display character names
+fetchData(apiUrl)
+  .then((movieData) => {
+    const characterPromises = movieData.characters.map(
+      (characterUrl) => fetchData(characterUrl) // Create an array of promises to fetch character data
+    );
+    return Promise.all(characterPromises); // Wait for all promises to resolve
+  })
+  .then((characters) => {
+    characters.forEach((character) => {
+      console.log(character.name); // Print the name of each character
+    });
+  })
+  .catch((error) => {
+    console.log('Error:', error.message); // Handle any errors that occur during the process
+  });
 
-const getCharNames = async () => {
-  await requestCharacters();
-  await requestNames();
-
-  for (const n of names) {
-    if (n === names[names.length - 1]) {
-      process.stdout.write(n);
-    } else {
-      process.stdout.write(n + '\n');
-    }
-  }
-};
-
-getCharNames();
