@@ -43,4 +43,3 @@ fetchData(apiUrl)
   .catch((error) => {
     console.log('Error:', error.message); // Handle any errors that occur during the process
   });
-
